@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection</title>
+</head>
+<style>/* CSS rules to style specific elements */
+    h1 {
+        color: #333; /* Change the color of h1 element */
+    }
+    
+    /* Style the form */
+    #uploadForm {
+        margin-bottom: 20px; /* Add some space below the form */
+    }
+    
+    /* Style the results section */
+    #results {
+        padding: 20px; /* Add padding around the results section */
+        background-color: #f0f0f0; /* Change the background color of the results section */
+    }
+    
+    /* Style the paragraph elements */
+    p {
+        margin: 10px 0; /* Add some space above and below each paragraph element */
+        font-size: 16px; /* Change the font size of paragraph elements */
+    }
+    </style>
+<body>
+    <h1>Object Detection</h1>
+    <form id="uploadForm" action="/detect" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" id="imageInput" accept="image/*" required>
+        <button type="submit" style="background-color: green; color: white; border: none; padding: 10px 20px; border-radius: 5px;">Detect Objects</button>
+
+    </form>
+    <hr>
+    <div id="results">
+        <h2>Results</h2>
+        <p id="carCount"></p>
+        <p id="truckCount"></p>
+        <p id="busCount"></p>
+        <p id="motorcycleCount"></p>
+        <p id="bicycleCount"></p>
+        <img id="originalImage" src="" alt="Original Image">
+        <img id="detectionImage" src="" alt="Detection Image">
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Create FormData object to send file to server
+            var formData = new FormData();
+            var fileInput = document.getElementById('imageInput');
+            formData.append('image', fileInput.files[0]);
+
+            // Send POST request to server
+            fetch('/detect', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update vehicle count
+                                
+                document.getElementById('carCount').innerText = 'Number of Cars Detected: ' + data.car_count;
+                document.getElementById('truckCount').innerText = 'Number of Trucks Detected: ' + data.truck_count;
+                document.getElementById('busCount').innerText = 'Number of Buses Detected: ' + data.bus_count;
+                document.getElementById('motorcycleCount').innerText = 'Number of Motorcycles Detected: ' + data.motorcycle_count;
+                document.getElementById('bicycleCount').innerText = 'Number of Bicycles Detected: ' + data.bicycle_count;
+
+
+                // Update original image
+                document.getElementById('originalImage').src = data.original_image_path;
+
+                // Update detection image
+                document.getElementById('detectionImage').src = data.detection_image_path;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
